@@ -1,3 +1,21 @@
+
+terraform {
+  required_providers {
+    aws = {
+      version = ">= 2.7.0"
+      source = "hashicorp/aws"
+    }
+  }
+  backend "remote" {
+    # The name of your Terraform Cloud organization.
+    organization = "example-org-28b01e"
+    # The name of the Terraform Cloud workspace to store Terraform state files in.
+    workspaces {
+      name = "nodejs-note-app"
+        }
+    }
+}
+
 # Provider Configuration
 provider "aws" {
   region = var.aws_region
