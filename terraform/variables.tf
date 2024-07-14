@@ -1,19 +1,19 @@
 
 variable "aws_region" {
-  default = "us-east-1"
+  default = "ap-southeast-2"
 }
 
 variable "subnet_availability_zone_1" {
-  default = "us-east-1a"
+  default = "ap-southeast-2a"
 }
 
 
 variable "subnet_availability_zone_2" {
-  default = "us-east-1b"
+  default = "ap-southeast-2b"
 }
 
 variable "s3_bucket_name" {
-  default = "madhura-notes-app-bucket-v1"
+  default = "nodejs-notes-app-bucket"
 }
 
 variable "dynamodb_table_name" {
@@ -31,7 +31,7 @@ variable "db_instance_identifier" {
 }
 
 variable "db_username" {
-  default = "madhura"
+  default = "malnz"
 }
 
 variable "db_password" {
