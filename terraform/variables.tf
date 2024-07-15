@@ -39,6 +39,6 @@ variable "db_password" {
 }
 
 variable "ec2_ami" {
-  default = "ami-04b70fa74e45c3917" # Amazon Ubuntu 24.04 LTS
+  default = "ami-04a81a99f5ec58529" # Amazon Ubuntu 24.04 LTS
 }
 
