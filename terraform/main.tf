@@ -211,9 +211,26 @@ resource "aws_db_instance" "postgresql" {
   final_snapshot_identifier = "notes-db-snapshot"
 }
 
+data "aws_ami" "latest_amazon_linux" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]  # Modify this filter as per your requirements
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["amazon"]  # Specify the owner of the AMI, in this case, Amazon
+}
+
+
 # EC2 Instance in Public Subnet
 resource "aws_instance" "web" {
-  ami                         = var.ec2_ami
+  ami                         = data.aws_ami.latest_amazon_linux.id
   instance_type               = "t2.micro"
   subnet_id                   = aws_subnet.public_subnet.id  # Use the public subnet ID
   associate_public_ip_address = true
