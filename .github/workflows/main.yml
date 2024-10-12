@@ -23,16 +23,16 @@ jobs:
           --build-arg RDS_USERNAME=${{ secrets.RDS_USERNAME }} \
           --build-arg RDS_PASSWORD=${{ secrets.RDS_PASSWORD }} \
           --build-arg S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
-          -t madhuraonline/nodejs-notes-app .
+          -t alvin1979/nodejs-api-aws .
       - name: Publish image to docker hub
-        run: docker push madhuraonline/nodejs-notes-app:latest
+        run: docker push alvin1979/nodejs-api-aws:latest
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Pull image from docker hub
-        run: docker pull madhuraonline/nodejs-notes-app:latest
+        run: docker pull alvin1979/nodejs-api-aws:latest
       - name: Run docker container
         run: |
           docker run -d -p 5000:5000 \
@@ -46,4 +46,4 @@ jobs:
           -e RDS_USERNAME=${{ secrets.RDS_USERNAME }} \
           -e RDS_PASSWORD=${{ secrets.RDS_PASSWORD }} \
           -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
-          madhuraonline/nodejs-notes-app
+          alvin1979/nodejs-api-aws
