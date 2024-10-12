@@ -99,6 +99,13 @@ resource "aws_security_group" "app_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # SSH access
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -227,32 +234,6 @@ data "aws_ami" "latest_amazon_linux" {
   owners = ["amazon"]  # Specify the owner of the AMI, in this case, Amazon
 }
 
-# Security Group to Allow SSH and HTTP Traffic
-resource "aws_security_group" "ec2_security_group" {
-  name        = "ec2-security-group"
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # SSH access
-  }
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Allow HTTP traffic
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 # EC2 Instance in Public Subnet
 resource "aws_instance" "web" {
   ami                         = data.aws_ami.latest_amazon_linux.id
@@ -261,7 +242,6 @@ resource "aws_instance" "web" {
   associate_public_ip_address = true
   tags                        = var.tags
   key_name                    = aws_key_pair.deployer_key.key_name
-  security_groups             = [aws_security_group.ec2_security_group.name]
 
   user_data = <<-EOF
     #!/bin/bash
