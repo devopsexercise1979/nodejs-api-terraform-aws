@@ -242,6 +242,7 @@ resource "aws_instance" "web" {
   associate_public_ip_address = true
   tags                        = var.tags
   key_name                    = aws_key_pair.deployer_key.key_name
+  vpc_security_group_ids      = [aws_security_group.app_sg.id]
 
   user_data = <<-EOF
     #!/bin/bash
