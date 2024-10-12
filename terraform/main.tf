@@ -261,7 +261,7 @@ resource "aws_instance" "web" {
   associate_public_ip_address = true
   tags                        = var.tags
   key_name                    = aws_key_pair.deployer_key.key_name
-  security_groups             = aws_security_group.ec2_security_group.name
+  security_groups             = [aws_security_group.ec2_security_group.name]
 
   user_data = <<-EOF
     #!/bin/bash
