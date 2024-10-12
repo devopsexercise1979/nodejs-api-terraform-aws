@@ -31,19 +31,27 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Pull image from docker hub
-        run: docker pull alvin1979/nodejs-api-aws:latest
-      - name: Run docker container
+      - name: Pull image from docker hub and deploy to EC2
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          HOSTNAME: ${{secrets.EC2_HOST}}
+          USER_NAME: ${{secrets.EC2_USERNAME}}
         run: |
-          docker run -d -p 5000:5000 \
-          --name nodejs-notes-app-container \
-          -e AWS_REGION=${{ secrets.AWS_REGION }} \
-          -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
-          -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
-          -e DYNAMODB_TABLE_NAME=${{ secrets.DYNAMODB_TABLE_NAME }} \
-          -e RDS_INSTANCE_IDENTIFIER=${{ secrets.RDS_INSTANCE_IDENTIFIER }} \
-          -e RDS_DB_NAME=${{ secrets.RDS_DB_NAME }} \
-          -e RDS_USERNAME=${{ secrets.RDS_USERNAME }} \
-          -e RDS_PASSWORD=${{ secrets.RDS_PASSWORD }} \
-          -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
-          alvin1979/nodejs-api-aws
+          # Create the SSH command
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
+            # Pull the latest Docker image
+            docker pull alvin1979/nodejs-api-aws:latest
+            docker run -d -p 5000:5000 \
+            --name nodejs-notes-app-container \
+            -e AWS_REGION=${{ secrets.AWS_REGION }} \
+            -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+            -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+            -e DYNAMODB_TABLE_NAME=${{ secrets.DYNAMODB_TABLE_NAME }} \
+            -e RDS_INSTANCE_IDENTIFIER=${{ secrets.RDS_INSTANCE_IDENTIFIER }} \
+            -e RDS_DB_NAME=${{ secrets.RDS_DB_NAME }} \
+            -e RDS_USERNAME=${{ secrets.RDS_USERNAME }} \
+            -e RDS_PASSWORD=${{ secrets.RDS_PASSWORD }} \
+            -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
+            alvin1979/nodejs-api-aws
+          '
