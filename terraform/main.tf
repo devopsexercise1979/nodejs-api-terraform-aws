@@ -227,6 +227,31 @@ data "aws_ami" "latest_amazon_linux" {
   owners = ["amazon"]  # Specify the owner of the AMI, in this case, Amazon
 }
 
+# Security Group to Allow SSH and HTTP Traffic
+resource "aws_security_group" "ec2_security_group" {
+  name        = "ec2-security-group"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # SSH access
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Allow HTTP traffic
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 
 # EC2 Instance in Public Subnet
 resource "aws_instance" "web" {
@@ -235,7 +260,18 @@ resource "aws_instance" "web" {
   subnet_id                   = aws_subnet.public_subnet.id  # Use the public subnet ID
   associate_public_ip_address = true
   tags                        = var.tags
+  key_name                    = aws_key_pair.deployer_key.key_name
+  security_groups             = aws_security_group.ec2_security_group.name
+
+  user_data = <<-EOF
+    #!/bin/bash
+    yum update -y
+    amazon-linux-extras install docker -y
+    service docker start
+    usermod -aG docker ec2-user
+  EOF
 }
+
 # IAM Role for EC2 Instance
 resource "aws_iam_role" "ec2_role" {
   name               = "ec2_role"
@@ -280,4 +316,15 @@ resource "aws_iam_policy" "ec2_policy" {
 resource "aws_iam_role_policy_attachment" "ec2_role_policy_attachment" {
   policy_arn = aws_iam_policy.ec2_policy.arn
   role       = aws_iam_role.ec2_role.name
+}
+
+# Generate SSH Key Pair
+resource "tls_private_key" "ssh_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "deployer_key" {
+  key_name   = "deployer-key"
+  public_key = tls_private_key.ssh_key.public_key_openssh
 }
