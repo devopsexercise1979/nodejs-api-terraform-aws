@@ -38,7 +38,8 @@ jobs:
           USER_NAME: ${{secrets.EC2_USERNAME}}
         run: |
           # Create the SSH command
-          cat "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          cat "$PRIVATE_KEY" > private_key
+          chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
             # Pull the latest Docker image
             docker pull alvin1979/nodejs-api-aws:latest
