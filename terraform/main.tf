@@ -241,7 +241,7 @@ resource "aws_instance" "web" {
   subnet_id                   = aws_subnet.public_subnet.id  # Use the public subnet ID
   associate_public_ip_address = true
   tags                        = var.tags
-  key_name                    = aws_key_pair.deployer_key.key_name
+  key_name                    = data.aws_key_pair.existing_key.docker-github-server-key
   vpc_security_group_ids      = [aws_security_group.app_sg.id]
 
   user_data = <<-EOF
@@ -299,13 +299,8 @@ resource "aws_iam_role_policy_attachment" "ec2_role_policy_attachment" {
   role       = aws_iam_role.ec2_role.name
 }
 
-# Generate SSH Key Pair
-resource "tls_private_key" "ssh_key" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
 
-resource "aws_key_pair" "deployer_key" {
-  key_name   = "deployer-key"
-  public_key = tls_private_key.ssh_key.public_key_openssh
+# Reference the Existing Key Pair by Name
+data "aws_key_pair" "existing_key" {
+  key_name = "docker-github-server-key"
 }
