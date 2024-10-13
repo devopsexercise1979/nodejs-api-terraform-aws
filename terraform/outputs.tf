@@ -47,9 +47,3 @@ output "ec2_public_ip" {
   description = "The public IP address of the EC2 instance"
   value       = aws_instance.web.public_ip
 }
-
-# Output private key to use in GitHub secrets
-output "private_key" {
-  value     = tls_private_key.ssh_key.private_key_pem
-  sensitive = false
-}
