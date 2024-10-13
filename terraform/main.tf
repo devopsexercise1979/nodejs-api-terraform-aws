@@ -241,7 +241,7 @@ resource "aws_instance" "web" {
   subnet_id                   = aws_subnet.public_subnet.id  # Use the public subnet ID
   associate_public_ip_address = true
   tags                        = var.tags
-  key_name                    = data.aws_key_pair.existing_key.docker-github-server-key
+  key_name                    = "github-ssh-key"
   vpc_security_group_ids      = [aws_security_group.app_sg.id]
 
   user_data = <<-EOF
@@ -302,5 +302,5 @@ resource "aws_iam_role_policy_attachment" "ec2_role_policy_attachment" {
 
 # Reference the Existing Key Pair by Name
 data "aws_key_pair" "existing_key" {
-  key_name = "docker-github-server-key"
+  key_name = "github-ssh-key"
 }
